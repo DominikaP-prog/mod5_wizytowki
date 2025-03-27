@@ -1,0 +1,85 @@
+import random
+
+# Klasa bazowa dla filmów i seriali
+class Media:
+    def __init__(self, title, release_year, genre, views=0):
+        self.title = title
+        self.release_year = release_year
+        self.genre = genre
+        self.views = views
+
+    def play(self):
+        self.views += 1
+
+# Klasa dla filmów
+class Movie(Media):
+    def __str__(self):
+        return f"{self.title} ({self.release_year})"
+
+# Klasa dla seriali
+class Series(Media):
+    def __init__(self, title, release_year, genre, episode, season, views=0):
+        super().__init__(title, release_year, genre, views)
+        self.episode = episode
+        self.season = season
+
+    def __str__(self):
+        return f"{self.title} S{self.season:02d}E{self.episode:02d}"
+
+# Funkcja do pobierania wszystkich filmów z biblioteki
+def get_movies(library):
+    return sorted([item for item in library if isinstance(item, Movie)], key=lambda x: x.title)
+
+# Funkcja do pobierania wszystkich seriali z biblioteki
+def get_series(library):
+    return sorted([item for item in library if isinstance(item, Series)], key=lambda x: x.title)
+
+# Funkcja do wyszukiwania filmu lub serialu po tytule
+def search(library, title):
+    for item in library:
+        if item.title.lower() == title.lower():
+            return item
+    return None
+
+# Funkcja do generowania losowych odtworzeń dla losowego elementu z biblioteki
+def generate_views(library):
+    item = random.choice(library)
+    item.views += random.randint(1, 100)
+
+# Funkcja do uruchomienia generate_views 10 razy
+def run_generate_views(library):
+    for _ in range(10):
+        generate_views(library)
+
+# Funkcja do pobierania najpopularniejszych tytułów
+def top_titles(library, n, content_type=None):
+    if content_type == 'movie':
+        items = get_movies(library)
+    elif content_type == 'series':
+        items = get_series(library)
+    else:
+        items = library
+
+    return sorted(items, key=lambda x: x.views, reverse=True)[:n]
+
+# Przykład użycia
+library = [
+    Movie("Pulp Fiction", 1994, "Crime"),
+    Movie("The Godfather", 1972, "Crime"),
+    Series("The Simpsons", 1989, "Animation", 5, 1),
+    Series("Breaking Bad", 2008, "Drama", 1, 1)
+]
+
+run_generate_views(library)
+
+print("Filmy:")
+for movie in get_movies(library):
+    print(movie)
+
+print("\nSeriale:")
+for series in get_series(library):
+    print(series)
+
+print("\nNajpopularniejsze tytuły:")
+for title in top_titles(library, 3):
+    print(f"{title} - {title.views} odtworzeń")
